@@ -9,6 +9,7 @@ namespace Saraiva
     class ADM
     {
         MenuADM menuADM;
+        DAO dao;
 
         public string login;
         public string senha;
@@ -16,6 +17,7 @@ namespace Saraiva
         public ADM()
         {
             menuADM = new MenuADM();
+            dao = new DAO();       
 
             this.Login = "ADM";
             this.Senha = "Saraiva@2022";

@@ -9,8 +9,9 @@ namespace Saraiva
 {
     class ControlCliente
     {
-        ADM adm;
+        MenuADM adm;
         DAO dao;
+        MenuLivros menuLivros;
 
         public int opcao;
         public int ano;
@@ -19,7 +20,8 @@ namespace Saraiva
 
         public ControlCliente()
         {
-            adm = new ADM();
+            menuLivros = new MenuLivros();  
+            adm = new MenuADM();
             dao = new DAO();
         }
 
@@ -28,9 +30,10 @@ namespace Saraiva
         {
             Console.WriteLine("\n-------Saraiva-------" +
                 "\nEscolha uma das opções:" +
-                "\n1. Cadastro Cliente" +
+                "\n1. Cadastro Cliente" +      
                 "\n2. Login Cliente" +
                 "\n3. Login ADM" +
+                "\n4. Acesso ao DONO" +
                 "\n0. Sair");
             opcao = Convert.ToInt32(Console.ReadLine());
 
@@ -84,23 +87,56 @@ namespace Saraiva
                         break;
 
                     case 2:
-                        Console.WriteLine("Login: ");
-                        login = Console.ReadLine();
-                        Console.WriteLine("Senha: ");
-                        senha = Console.ReadLine();
 
-                        dao.AcessarConta(login, senha);
+                        dao.PreencherVetor("cadastro");
+                        do
+                        {
+                            Console.WriteLine("Login: ");
+                            login = Console.ReadLine();
+                            Console.WriteLine("Senha: ");
+                            senha = Console.ReadLine();
+                            if (dao.AcessarConta("cadastro", login, senha) == true)
+                            {
+                                menuLivros.Operacao();
+                            }
+                            Console.WriteLine("Login e senha incorretos, digite corretamente.");
+                        } while (dao.AcessarConta("cadastro", login, senha) == false);
                         break;
 
                     case 3:
-                        Console.WriteLine("Login ADM: ");
-                        login = Console.ReadLine();
-                        Console.WriteLine("Senha ADM: ");
-                        senha = Console.ReadLine();
+                        dao.PreencherVetor("ADM");
+                        do
+                        {
+                            Console.WriteLine("LoginADM: ");
+                            login = Console.ReadLine();
+                            Console.WriteLine("SenhaADM: ");
+                            senha = Console.ReadLine();
+                            if (dao.AcessarConta("ADM", login, senha) == true)
+                            {
+                                adm.OperacaoADM();                               
+                            }
+                            Console.WriteLine("Login e senha incorretos, digite corretamente.");
+                        } while (dao.AcessarConta("ADM", login, senha) == false);
+                        break;
 
-                        adm.AcessarConta(login, senha);
+                    case 4:
+                        dao.PreencherVetor("ADM");
+                        do
+                        {
+                            Console.WriteLine("LoginADM: ");
+                            login = Console.ReadLine();
+                            Console.WriteLine("SenhaADM: ");
+                            senha = Console.ReadLine();
+                            if (dao.AcessarConta("ADM", login, senha) == true)
+                            {
+                                adm.OperacaoADM();
+                            }
+                            Console.WriteLine("Login e senha incorretos, digite corretamente.");
+                        } while (dao.AcessarConta("ADM", login, senha) == false);
                         break;
                 }
+
+
 
             } while (opcao != 0);
 

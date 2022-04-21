@@ -49,13 +49,12 @@ namespace Saraiva
             Console.WriteLine("Digite o numero do Cartão:");
             int numeroDoCartao = Convert.ToInt32(Console.ReadLine());     
             Console.WriteLine("Digite o CVV:");
-            string dataDeVenc = Console.ReadLine();           
+            DateTime dataDeVenc = Convert.ToDateTime(Console.ReadLine());           
             Console.WriteLine("Digite a Data de Vencimento");
             int cvv = Convert.ToInt32(Console.ReadLine());
             dao.CartoesdeCreditos(cpf, numeroDoCartao, dataDeVenc, cvv);
 
             Console.WriteLine("Compra Efetuada com Sucesso");
-
         }    
     }
 }

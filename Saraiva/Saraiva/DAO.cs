@@ -13,7 +13,7 @@ namespace Saraiva
     {
         //Var
 
-        MenuLivros menuLivros;
+        
         MySqlConnection conexao;
         public string dados;
         public string resultado;
@@ -23,17 +23,17 @@ namespace Saraiva
         public string[] nome;
         public string[] telefone;
         public string[] endereco;
-        public string[] dataDeNascimento;
+        public DateTime[] dataDeNascimento;
         public string[] login;
         public string[] senha;
         public int[] codigo;
         public string[] titulo;
-        public string[] ano;
+        public DateTime[] ano;
         public string[] editora;
         public double[] valor;
         public int[] quantidadeEstoque;
         public int[] numeroDoCartao;
-        public string[] dataDeVenc;
+        public DateTime[] dataDeVenc;
         public int[] cvv;
         public int i;
         public string msg;
@@ -41,13 +41,12 @@ namespace Saraiva
 
         public DAO()
         {
-            //menuLivros = new MenuLivros();
+            
 
-            conexao = new MySqlConnection("server=localhost;DataBase=Saraiva;Uid=root;Password=;");
+            conexao = new MySqlConnection("server=localhost;DataBase=Saraiva;Uid=root;Password=;Convert Zero DateTime=True;");
             try
             {
-                conexao.Open();
-                Console.WriteLine("Sistema Online");
+                conexao.Open();              
             }
             catch (Exception e)
             {
@@ -60,11 +59,11 @@ namespace Saraiva
         {
             try
             {
-                dados = "('" + cpf + "','" + nome + "','" + telefone + "','" + endereco + "', '" + dataDeNascimento + "', '" + login + "', '" + senha + "')";
+                dados = "('" + cpf + "','" + nome + "','" + telefone + "','" + endereco + "', '" + dataDeNascimento.ToString("yyyy-MM-dd")+ "', '" + login + "', '" + senha + "')";
                 resultado = "Insert into Cadastro(cpf, nome, telefone, endereco,dataDeNascimento,login,senha) values" + dados;
                 MySqlCommand sql = new MySqlCommand(resultado, conexao);
                 resultado = "" + sql.ExecuteNonQuery();
-                Console.WriteLine(resultado + "Linha(s) Afetada(s)!");
+                Console.WriteLine(resultado + "Cadastro feito com Sucesso !");
             }
             catch (Exception e)
             {
@@ -72,66 +71,112 @@ namespace Saraiva
             }
         }
 
-        public void AcessarConta(string log, string sen)
+        public bool AcessarConta(string nomeTabela, string log, string sen)
         {
-            PreencherVetor();
+            PreencherVetor(nomeTabela);
             for (int i = 0; i < contador; i++)
             {
                 if ((log == login[i]) && (sen == senha[i]))
-                {
-                    Console.WriteLine("Bem vindo!");
-                    menuLivros.Operacao();
+                {                    
+                    return true;                    
                 }
-                else
-                {
-                    Console.WriteLine("Login e senha incorretos, digite corretamente.");
-                }
-            }
-        }
+               
+            }        
+            return false;
+        }     
 
-
-        public void PreencherVetor()
+        public void InserirADM(string login, string senha)
         {
-            string query = "select * from cadastro";
-
-            cpf = new int[100];
-            nome = new string[100];
-            telefone = new string[100];
-            endereco = new string[100];
-            dataDeNascimento = new string[100];
-            login = new string[100];
-            senha = new string[100];
-
-            for (i = 0; i < 100; i++)
+            try
             {
-                cpf[i] = 0;
-                nome[i] = "";
-                telefone[i] = "";
-                endereco[i] = "";
-                dataDeNascimento[i] = "";
-                login[i] = "";
-                senha[i] = "";
+                dados = $"('','{login}','{senha}')";
+                resultado = "Insert into ADM(codigo,login,senha) values" + dados;
+                MySqlCommand sql = new MySqlCommand(resultado, conexao);
+                resultado = "" + sql.ExecuteNonQuery();
+                Console.WriteLine(resultado + "Cadastro feito com Sucesso !");
             }
+            catch (Exception e)
+            {
+                Console.WriteLine("Algo Deu Errado!\n\n" + e);
+            }
+        }       
 
+
+        public void PreencherVetor(string nomeTabela)
+        {
+            string query = "select * from " + nomeTabela;
+
+            
             MySqlCommand coletar = new MySqlCommand(query, conexao);
             MySqlDataReader leitura = coletar.ExecuteReader();
-
-            i = 0;
-            while (leitura.Read())
+            if (nomeTabela == "cadastro")
             {
-                cpf[i] = (int)Convert.ToInt64(leitura["cpf"]);
-                nome[i] = leitura["nome"] + "";
-                telefone[i] = leitura["telefone"] + "";
-                endereco[i] = leitura["endereco"] + "";
-                dataDeNascimento[i] = leitura["dataDeNascimento"] + "";
-                login[i] = leitura["login"] + "";
-                senha[i] = leitura["senha"] + "";
-                i++;
-                contador++;
-            }
+                login = new string[100];
+                senha = new string[100];
+                cpf = new int[100];
+                nome = new string[100];
+                telefone = new string[100];
+                endereco = new string[100];
+                dataDeNascimento = new DateTime[100];
 
-            leitura.Close();
+                for (i = 0; i < 100; i++)
+                {
+                    cpf[i] = 0;
+                    nome[i] = "";
+                    telefone[i] = "";
+                    endereco[i] = "";
+                    dataDeNascimento[i] = new DateTime();                  
+                }
+
+                i = 0;
+                while (leitura.Read())
+                {
+                    cpf[i] = (int)Convert.ToInt64(leitura["cpf"]);
+                    nome[i] = leitura["nome"] + "";
+                    telefone[i] = leitura["telefone"] + "";
+                    endereco[i] = leitura["endereco"] + "";
+                    dataDeNascimento[i] = DateTime.Parse(leitura["dataDeNascimento"] + "");
+                    login[i] = leitura["login"] + "";
+                    senha[i] = leitura["senha"] + "";
+                    i++;
+                    contador++;
+                }
+                
+
+
+                leitura.Close();
+            }
+            else
+            {
+                
+                if(nomeTabela == "ADM" || nomeTabela == "DONO")
+                {
+                    codigo = new int[100];
+                    login = new string[100];
+                    senha = new string[100];
+
+                    codigo[i] = 0;
+                    login[i] = "";
+                    senha[i] = "";
+
+                    i = 0;
+                    while (leitura.Read())
+                    {
+                        codigo[i] = (int)Convert.ToInt64(leitura["codigo"]);
+                        login[i] = leitura["login"] + "";
+                        senha[i] = leitura["senha"] + "";
+                        i++;
+                        contador++;
+                    }
+
+                    leitura.Close();
+                }
+                
+            }
+           
         }
+
+
 
         public void PreencherVetorCartao()
         {
@@ -139,14 +184,14 @@ namespace Saraiva
 
             cpf = new int[100];
             numeroDoCartao = new int[100];
-            dataDeVenc = new string[100];
+            dataDeVenc = new DateTime[100];
             cvv = new int[100];          
 
             for (i = 0; i < 100; i++)
             {
                 cpf[i] = 0;
                 numeroDoCartao[i] = 0;
-                dataDeVenc[i] = "";
+                dataDeVenc[i] = new DateTime();
                 cvv[i] = 0;
                 
             }
@@ -159,7 +204,7 @@ namespace Saraiva
             {
                 cpf[i] = (int)Convert.ToInt64(leitura["cpf"]);
                 numeroDoCartao[i] = (int)Convert.ToInt64(leitura["numeroDoCartao"]);
-                dataDeVenc[i] = leitura["dataDeVenc"] + "";
+                dataDeVenc[i] = DateTime.Parse(leitura["dataDeVenc"] + "");
                 cvv[i] = (int)Convert.ToInt64(leitura["cvv"]);
                 i++;
                 contador++;
@@ -168,11 +213,11 @@ namespace Saraiva
             leitura.Close();
         }
 
-        public void CartoesdeCreditos(int cpf, int numeroDoCartao, string dataDeVenc, int cvv)
+        public void CartoesdeCreditos(int cpf, int numeroDoCartao, DateTime dataDeVenc, int cvv)
         {
             try
             {
-                dados = "('','" + cpf + "','" + numeroDoCartao + "','" + dataDeVenc + "','" + cvv + "')";
+                dados = "('','" + cpf + "','" + numeroDoCartao + "','" + dataDeVenc.ToString("yyyy-MM-dd")+ "','" + cvv + "')";
                 resultado = "Insert into Cartao(cpf, numeroDoCartao, dataDeVenc, cvv) values" + dados;
                 MySqlCommand sql = new MySqlCommand(resultado, conexao);
                 resultado = "" + sql.ExecuteNonQuery();
@@ -193,7 +238,7 @@ namespace Saraiva
             editora = new string[100];
             valor = new double[100];
             quantidadeEstoque = new int[100];
-            ano = new string[100];          
+            ano = new DateTime[100];          
 
             for (i = 0; i < 100; i++)
             {
@@ -202,7 +247,7 @@ namespace Saraiva
                 editora[i] = "";
                 valor[i] = 0;
                 quantidadeEstoque[i] = 0;
-                ano[i] = "";               
+                ano[i] = new DateTime();               
             }
 
  
@@ -217,7 +262,7 @@ namespace Saraiva
                 editora[i] = leitura["editora"] + "";
                 valor[i] = Convert.ToDouble(leitura["valor"]);
                 quantidadeEstoque[i] = (int) Convert.ToInt64 (leitura["quantidadeEstoque"]);
-                ano[i] = leitura["ano"] + "";               
+                ano[i] = DateTime.Parse(leitura["ano"] + "");               
                 i++;
                 contador++;
             }
@@ -225,11 +270,11 @@ namespace Saraiva
         }
  
 
-        public void InserirLivros( string titulo, string ano, string editora, double valor, int quantidadeEstoque)
+        public void InserirLivros( string titulo, DateTime ano, string editora, double valor, int quantidadeEstoque)
         {
             try
             {
-                dados = "('','" + titulo + "','" + ano + "','" + editora + "','" + valor+ "','"+ quantidadeEstoque+"')";
+                dados = "('','" + titulo + "','" + ano.ToString("yyyy-MM-dd") + "','" + editora + "','" + valor+ "','"+ quantidadeEstoque+"')";
                 resultado = "Insert into Livros(codigo, titulo, ano, editora, valor, quantidadeEstoque) values" + dados;
                 MySqlCommand sql = new MySqlCommand(resultado, conexao);
                 resultado = "" + sql.ExecuteNonQuery();
@@ -250,7 +295,7 @@ namespace Saraiva
             {
                 msg += "\n\nCódigo: " + codigo[i]
                     + ", Titulo: " + titulo[i]
-                    + ", Ano: " + ano[i]
+                    + ", Ano: " + ano[i].ToString("yyyy")
                     + ", Editora: " + editora[i]
                     + ", Valor: " + valor[i]
                     + ",Quantidade em Estoque: "+ quantidadeEstoque[i];
@@ -259,6 +304,20 @@ namespace Saraiva
         }
         
       
+        public void AtualizarLivrosData(DateTime Data, string campo, int codigo)
+        {
+            try
+            {
+                resultado = " update livros set " + campo + " = '" + Data.ToString("yyyy-MM-dd") + "' where codigo = '" + codigo + "'";
+                MySqlCommand sql = new MySqlCommand(resultado, conexao);
+                resultado = "" + sql.ExecuteNonQuery();
+                Console.WriteLine("Dado atualizado com sucesso!");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Algo deu errado!" + e);
+            }
+        }
 
         public void AtualizarLivros(string campo, string novoDado, int codigo)
         {
@@ -277,7 +336,7 @@ namespace Saraiva
 
         public string BuscarLivro(int cod)
         {
-            PreencherVetor();
+            PreencherVetor("Livros");
             for (int i = 0; i < contador; i++)
             {
                 if (cod == codigo[i])
@@ -288,18 +347,18 @@ namespace Saraiva
             return "Codigo não encontrado !!!";
         }//fim do consult titulo
 
-        public double BuscarValor(int cod)
-        {
-            PreencherVetor();
-            for (int i = 0; i < contador; i++)
-            {
-                if (cod == codigo[i])
-                {
-                    return valor[i];
-                }
-            }//fim do for
-            return -1;
-        }//fim do consult titulo
+        //public double BuscarValor(int cod)
+        //{
+           // PreencherVetor();
+          //  for (int i = 0; i < contador; i++)
+           // {
+              //  if (cod == codigo[i])
+            //    {
+             //       return valor[i];
+            //    }
+           // }//fim do for
+           // return -1;
+       // }//fim do consult titulo
 
         public string PreencherLivros()
         {

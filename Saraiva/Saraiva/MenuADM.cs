@@ -32,6 +32,7 @@ namespace Saraiva
         public void OperacaoADM()
         {
             Console.Clear();
+            int codigo;
             do
             {
                 ListaADM();
@@ -48,7 +49,7 @@ namespace Saraiva
                         Console.WriteLine("Informe o titulo do livro: ");
                         string titulo = Console.ReadLine();
                         Console.WriteLine("Informe o ano do livro:");
-                        string ano = Console.ReadLine();
+                        DateTime ano = Convert.ToDateTime(Console.ReadLine());
                         Console.WriteLine("Informe a editora do livro: ");
                         string editora = Console.ReadLine();
                         Console.WriteLine("Informe o valor do livro: ");
@@ -75,13 +76,24 @@ namespace Saraiva
 
                     case 4:
                         Console.WriteLine("Informe o campo a ser atualizado: ");
-                        string campo = Console.ReadLine();
-                        Console.WriteLine("Informe o novo dado: ");
-                        string novoDado = Console.ReadLine();
-                        Console.WriteLine("Informe o codigo do produto a ser atualizado: ");
-                        int codigo = Convert.ToInt32(Console.ReadLine());
-
-                        dao.AtualizarLivros(campo, novoDado, codigo);
+                        string campo = Console.ReadLine();                       
+                        if (campo == "ano")
+                        {
+                            Console.WriteLine("Informe a nova data: ");
+                            DateTime novoDado = Convert.ToDateTime(Console.ReadLine());
+                            Console.WriteLine("Informe o codigo do produto a ser atualizado: ");
+                            codigo = Convert.ToInt32(Console.ReadLine());
+                            dao.AtualizarLivrosData(novoDado, campo, codigo);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Informe o novo dado: ");
+                            string novoDado = Console.ReadLine();
+                            Console.WriteLine("Informe o codigo do produto a ser atualizado: ");
+                            codigo = Convert.ToInt32(Console.ReadLine());
+                            dao.AtualizarLivros(campo, novoDado, codigo);
+                        }
+                         
                         break;
 
                     case 5:
